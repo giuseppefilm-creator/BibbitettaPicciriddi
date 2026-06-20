@@ -1,0 +1,553 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#1d1d1d">
+
+<!-- PWA: installabile su Android e iOS -->
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="icon.svg">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Bibbietta">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="application-name" content="Bibbietta">
+
+<title>Bibbietta · Catania</title>
+<style>
+  :root{
+    --gold:#E9B84A; --coral:#F47C72; --ink:#1d1d1d; --paper:#fffdf8;
+    --text:#33312e; --muted:#8a857d; --line:#ece6da; --green:#1fa463; --red:#d83a2f;
+    --card:#ffffff; --shadow:0 2px 10px rgba(40,35,25,.06);
+  }
+  *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+  html{scroll-behavior:smooth;}
+  body{
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    background:var(--paper); color:var(--text);
+    -webkit-font-smoothing:antialiased; padding-bottom:40px;
+  }
+  .wrap{max-width:540px; margin:0 auto; }
+
+  /* ---- header ---- */
+  header{
+    position:sticky; top:0; z-index:30; background:var(--ink); color:#fff;
+    padding:calc(env(safe-area-inset-top) + 14px) 16px 12px;
+    box-shadow:0 4px 18px rgba(0,0,0,.18);
+  }
+  .hd-top{display:flex; align-items:center; justify-content:space-between;}
+  .brand-eyebrow{font-size:10px; letter-spacing:.34em; color:var(--gold); font-weight:700;}
+  .brand-title{font-weight:800; font-size:23px; letter-spacing:.02em; line-height:1.05; margin-top:1px; cursor:pointer;}
+  .brand-title b{color:var(--coral);}
+  .dots-badge{
+    width:42px;height:42px;border-radius:50%;
+    background:var(--gold);
+    background-image:radial-gradient(rgba(255,255,255,.85) 1.3px,transparent 1.4px);
+    background-size:8px 8px; flex:none;
+  }
+  .search{margin-top:12px; position:relative;}
+  .search input{
+    width:100%; border:none; border-radius:12px; padding:12px 14px 12px 40px;
+    font-size:16px; background:#2c2a27; color:#fff; outline:none;
+  }
+  .search input::placeholder{color:#9b958c;}
+  .search svg{position:absolute; left:13px; top:50%; transform:translateY(-50%); opacity:.6;}
+
+  /* ---- emergency bar ---- */
+  .sos{display:flex; gap:8px; padding:12px 14px 6px;}
+  .sos a{
+    flex:1; text-decoration:none; background:var(--red); color:#fff; border-radius:12px;
+    padding:9px 4px; text-align:center; box-shadow:var(--shadow);
+  }
+  .sos .num{font-weight:800; font-size:18px; line-height:1;}
+  .sos .lab{font-size:10px; opacity:.92; margin-top:3px; letter-spacing:.02em;}
+
+  .crewbtn{display:flex; align-items:center; justify-content:center; gap:8px;
+    width:calc(100% - 28px); margin:2px 14px 6px; padding:13px; border:none; border-radius:13px;
+    background:var(--ink); color:#fff; font-size:15px; font-weight:800; letter-spacing:.04em;
+    box-shadow:var(--shadow); cursor:pointer;}
+  .crewbtn:active{transform:scale(.99);}
+  .crewbtn .film{color:var(--coral);}
+
+  /* ---- chips ---- */
+  .chips{display:flex; gap:8px; overflow-x:auto; padding:8px 14px 10px; scrollbar-width:none;
+    position:sticky; top:0; }
+  .chips::-webkit-scrollbar{display:none;}
+  .chipbar{position:sticky; top:0; z-index:20; background:var(--paper); border-bottom:1px solid var(--line);}
+  .chip{
+    flex:none; border:1.5px solid var(--line); background:#fff; color:var(--text);
+    border-radius:999px; padding:8px 14px; font-size:13.5px; font-weight:600; white-space:nowrap;
+    cursor:pointer; transition:.15s;
+  }
+  .chip.on{background:var(--ink); color:#fff; border-color:var(--ink);}
+  .chip.star.on{background:var(--gold); border-color:var(--gold); color:#3a2e08;}
+
+  /* ---- sections & cards ---- */
+  main{padding:6px 14px 0;}
+  .sec-title{display:flex; align-items:center; gap:8px; margin:20px 2px 10px; }
+  .sec-title .ic{font-size:20px;}
+  .sec-title h2{font-size:13px; font-weight:800; letter-spacing:.16em; text-transform:uppercase; color:var(--ink);}
+  .sec-title .rule{flex:1; height:3px; border-radius:3px; background:var(--gold); opacity:.55;}
+
+  .card{
+    background:var(--card); border-radius:16px; padding:13px 14px; margin-bottom:11px;
+    box-shadow:var(--shadow); border:1px solid #f1ece1;
+  }
+  .card-h{display:flex; align-items:flex-start; gap:8px;}
+  .card-h .nm{font-weight:700; font-size:16px; color:var(--ink); line-height:1.2; flex:1;}
+  .fav{flex:none; font-size:19px; line-height:1; cursor:pointer; color:#d8d2c5; padding:0 2px;}
+  .fav.on{color:var(--gold);}
+  .tags{display:flex; flex-wrap:wrap; gap:5px; margin-top:6px;}
+  .tag{font-size:10.5px; font-weight:700; letter-spacing:.03em; padding:2.5px 7px; border-radius:6px;}
+  .tag.hot{background:var(--coral); color:#fff;}
+  .tag.gold{background:var(--gold); color:#3a2e08;}
+  .tag.soft{background:#f0ece2; color:#7a756c;}
+  .meta{font-size:13px; color:var(--text); margin-top:8px; line-height:1.45;}
+  .meta .h{color:var(--muted);}
+  .desc{font-size:12.5px; color:var(--muted); margin-top:5px; line-height:1.45;}
+
+  .actions{display:flex; gap:8px; margin-top:11px;}
+  .btn{
+    flex:1; display:flex; align-items:center; justify-content:center; gap:6px;
+    text-decoration:none; border-radius:11px; padding:10px 6px; font-size:13.5px; font-weight:700;
+    min-height:42px; transition:.12s; cursor:pointer; border:none;
+  }
+  .btn:active{transform:scale(.97);}
+  .btn-call{background:var(--coral); color:#fff;}
+  .btn-map{background:#fff; color:var(--ink); border:1.5px solid var(--line);}
+  .btn-wa{background:var(--green); color:#fff;}
+  .btn-mail{background:#3a352e; color:#fff;}
+  .btn svg{width:16px;height:16px;}
+
+  .empty{text-align:center; color:var(--muted); padding:50px 20px; font-size:14px;}
+
+  /* home tiles */
+  .home-intro{font-size:12px; font-weight:700; letter-spacing:.14em; text-transform:uppercase; color:var(--muted); margin:14px 2px 10px;}
+  .home{display:grid; grid-template-columns:1fr 1fr; gap:11px; padding-bottom:6px;}
+  .tile{background:#fff; border:1px solid #f1ece1; border-radius:16px; padding:15px 14px; box-shadow:var(--shadow);
+    cursor:pointer; display:flex; flex-direction:column; gap:5px; min-height:92px; transition:.12s;}
+  .tile:active{transform:scale(.97);}
+  .tile .ic{font-size:24px; line-height:1;}
+  .tile .t{font-weight:800; font-size:15px; color:var(--ink); line-height:1.15;}
+  .tile .c{font-size:11.5px; color:var(--muted);}
+  .tile.troupe{grid-column:1 / -1; background:var(--ink);}
+  .tile.troupe .t{color:#fff;} .tile.troupe .c{color:var(--gold);}
+  .tile.fav{background:#fff8e8; border-color:#f0e2bf;}
+
+  /* department headers in crew list */
+  .dep-head{font-size:11px; font-weight:800; letter-spacing:.14em; text-transform:uppercase; color:var(--coral);
+    margin:16px 2px 9px; display:flex; align-items:center; gap:8px;}
+  .dep-head::after{content:''; flex:1; height:2px; background:var(--line); border-radius:2px;}
+
+  footer{margin-top:26px; padding:20px 18px calc(env(safe-area-inset-bottom) + 16px);
+    border-top:1px solid var(--line); color:var(--muted); font-size:11px; line-height:1.7; text-align:center;}
+  footer b{color:var(--text);}
+  .tip{font-size:11.5px; color:var(--muted); text-align:center; padding:4px 16px 0;}
+
+  /* ---- banner installazione ---- */
+  #install-banner{
+    display:none; align-items:center; gap:10px;
+    margin:8px 14px 2px; padding:11px 14px; border-radius:13px;
+    background:#fff8e8; border:1.5px solid var(--gold);
+    font-size:13px; color:var(--text);
+  }
+  #install-banner .ib-text{flex:1; line-height:1.4;}
+  #install-banner strong{display:block; font-weight:800; font-size:13.5px;}
+  #install-btn{
+    flex:none; border:none; border-radius:9px; background:var(--ink); color:#fff;
+    font-size:13px; font-weight:700; padding:9px 14px; cursor:pointer;
+  }
+  #install-close{flex:none; background:none; border:none; font-size:20px; color:var(--muted); cursor:pointer; padding:0 2px;}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header>
+    <div class="hd-top">
+      <div>
+        <div class="brand-eyebrow">RODEO DRIVE · PRESENTA</div>
+        <div class="brand-title">BIBBIETTA · <b>CATANIA</b></div>
+      </div>
+      <div class="dots-badge"></div>
+    </div>
+    <div class="search">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4-4"/></svg>
+      <input id="q" type="search" placeholder="Cerca un posto, una via, un servizio…" autocomplete="off">
+    </div>
+  </header>
+
+  <!-- Banner installazione (appare su Android Chrome) -->
+  <div id="install-banner">
+    <span style="font-size:24px">📲</span>
+    <div class="ib-text">
+      <strong>Installa l'app</strong>
+      Aggiungila alla schermata Home per aprirla sempre in un tap.
+    </div>
+    <button id="install-btn">Installa</button>
+    <button id="install-close">✕</button>
+  </div>
+
+  <div class="sos">
+    <a href="tel:112"><div class="num">112</div><div class="lab">Emergenze</div></a>
+    <a href="tel:118"><div class="num">118</div><div class="lab">Ambulanza</div></a>
+    <a href="tel:115"><div class="num">115</div><div class="lab">Pompieri</div></a>
+    <a href="tel:113"><div class="num">113</div><div class="lab">Polizia</div></a>
+  </div>
+
+  <button id="crewBtn" class="crewbtn">🎬 ELENCO TROUPE · <span class="film">PICCIRIDDI</span></button>
+
+  <div class="chipbar"><div class="chips" id="chips"></div></div>
+
+  <p class="tip">Tocca <b>Chiama</b> per telefonare, <b>Indicazioni</b> per aprire le mappe, <b>Prenota</b> per scrivere su WhatsApp.</p>
+
+  <main id="list"></main>
+
+  <footer>
+    <b>Rodeo Drive S.r.l.</b> — Guida di produzione · Catania (Sicilia)<br>
+    Tel. 06 4544 9767 · pec: rodeo@rodeodrivesrl.com<br>
+    Riferimento: Piazza Duomo. Orari e recapiti possono variare: conviene confermare con una telefonata.
+  </footer>
+</div>
+
+<script>
+/* ---------------- data ---------------- */
+const CATS = [
+  {k:'fav',   label:'⭐ Preferiti', ic:'⭐', title:'Preferiti', star:true},
+  {k:'troupe',label:'🎬 Troupe',   ic:'🎬', title:'Elenco troupe · Picciriddi'},
+  {k:'utili', label:'Numeri utili', ic:'☎️', title:'Numeri & luoghi utili'},
+  {k:'rist',  label:'Ristoranti',   ic:'🍽️', title:'Ristoranti in zona'},
+  {k:'pizza', label:'Pizza',        ic:'🍕', title:'Pizza & serate'},
+  {k:'dolci', label:'Dolci',        ic:'🍦', title:'Caffè, dolci & gelato'},
+  {k:'farma', label:'Farmacie',     ic:'💊', title:'Farmacie'},
+  {k:'sanita',label:'Sanità',       ic:'➕', title:'Istituzioni sanitarie'},
+  {k:'spesa', label:'Spesa',        ic:'🛒', title:'Supermercati'},
+  {k:'lav',   label:'Lavanderie',   ic:'🧺', title:'Lavanderie'},
+  {k:'vedere',label:'Da vedere',    ic:'⛱️', title:'Svago & da vedere'},
+];
+
+const TILE = {
+  troupe:{ic:'🎬', t:'Elenco troupe'}, utili:{ic:'☎️', t:'Numeri utili'},
+  rist:{ic:'🍽️', t:'Ristoranti'},     pizza:{ic:'🍕', t:'Pizza & street food'},
+  dolci:{ic:'🍦', t:'Dolci & gelato'}, farma:{ic:'💊', t:'Farmacie'},
+  sanita:{ic:'➕', t:'Sanità'},        spesa:{ic:'🛒', t:'Spesa'},
+  lav:{ic:'🧺', t:'Lavanderie'},       vedere:{ic:'⛱️', t:'Da vedere'},
+  fav:{ic:'⭐', t:'Preferiti'}
+};
+const DEPS = ['Regia','Produzione','Casting','Location','Fotografia','Scenografia','Costumi','Trucco e parrucco','Elettricisti','Macchinisti'];
+
+const P = [
+  // ---- troupe (Picciriddi) ----
+  {c:'troupe', dep:'Regia', role:'Regista', n:'Lorenzo Collalti', tel:'351 67 86 949', email:'lorenzocollaltipicciriddi@gmail.com'},
+  {c:'troupe', dep:'Regia', role:'Aiuto regista', n:'Rosario Pucciarelli', tel:'388 18 68 553', email:'rosariopucciarelli@gmail.com'},
+  {c:'troupe', dep:'Regia', role:'Segretaria d’edizione', n:'Roberta Finocchiaro', tel:'339 50 71 629', email:'soleo311@hotmail.com'},
+  {c:'troupe', dep:'Produzione', role:'Produttore esecutivo', n:'Davide Tovi', tel:'393 50 73 594', email:'davide.tovi@gmail.com'},
+  {c:'troupe', dep:'Produzione', role:'Organizzatore generale', n:'Giuseppe Manzi', tel:'333 47 30 393', email:'giuseppemanzimail@gmail.com'},
+  {c:'troupe', dep:'Produzione', role:'Coordinatrice di produzione', n:'Susanna Manca', tel:'349 77 88 937', email:'susannamancamail@gmail.com'},
+  {c:'troupe', dep:'Produzione', role:'Segretario di produzione', n:'Simone Oppes', tel:'366 27 12 222', email:'simone.oppes.lav@outlook.com'},
+  {c:'troupe', dep:'Casting', role:'Casting director', n:'Nike Pirrone', tel:'338 32 55 391', email:'nikepirrone@gmail.com'},
+  {c:'troupe', dep:'Casting', role:'Casting', n:'Mariama Diena', tel:'392 19 11 972', email:'mariamadiene02@gmail.com'},
+  {c:'troupe', dep:'Location', role:'Location manager', n:'Danilo Cori', email:'coridanilo82@gmail.com'},
+  {c:'troupe', dep:'Fotografia', role:'Direttore della fotografia', n:'Daniele Ciprì', tel:'329 40 14 627'},
+  {c:'troupe', dep:'Scenografia', role:'Scenografo', n:'Vincenzo Napoli', tel:'338 40 12 149', email:'vicnap@hotmail.it'},
+  {c:'troupe', dep:'Costumi', role:'Costumista', n:'Beatrice Giannini', tel:'347 65 55 689', email:'b3g@hotmail.it'},
+  {c:'troupe', dep:'Trucco e parrucco', role:'Capo truccatrice', n:'Francesca Rossi', tel:'334 97 10 826', email:'francescarossi69@hotmail.it'},
+  {c:'troupe', dep:'Elettricisti', role:'Capo elettricista', n:'Maurizio Matania', tel:'348 38 14 485', email:'matalighting@gmail.com'},
+  {c:'troupe', dep:'Macchinisti', role:'Capo macchinista', n:'Antonio Caracciolo', tel:'340 68 12 098', email:'antoniocaracciolo.grip@gmail.com'},
+
+  // ---- numeri & luoghi utili ----
+  {c:'utili', n:'Questura di Catania', tel:'095 7367111', a:'Viale Ulisse, 8', q:'Questura di Catania Viale Ulisse'},
+  {c:'utili', n:'Comando Provinciale Carabinieri', tel:'095 537999', a:'Piazza Giovanni Verga, 8', q:'Comando Provinciale Carabinieri Catania'},
+  {c:'utili', n:'Polizia Municipale (Vigili)', tel:'095 531333', a:'Piazza Spedini, 5/A', q:'Polizia Municipale Catania Piazza Spedini'},
+  {c:'utili', n:'Comune di Catania', tel:'095 7421111', a:'Piazza Duomo · Palazzo degli Elefanti', co:'37.5037,15.0875'},
+  {c:'utili', n:'Protezione Civile (24h)', tel:'095 484627', a:'Servizio comunale', call:true},
+  {c:'utili', n:'Guardia Medica · Continuità Assistenziale', tags:[['Notte/festivi','gold']], tel:'095 377122', a:'Corso Italia, 234 (alt. 095 382113)', q:'Guardia Medica Corso Italia Catania'},
+  {c:'utili', n:'Aeroporto Catania-Fontanarossa', tel:'095 7239111', a:'Aeroporto di Catania', q:'Aeroporto Catania Fontanarossa'},
+  {c:'utili', n:'Radio Taxi Catania', tags:[['Trasporti','soft']], tel:'095 330966', a:'Servizio 24h', call:true},
+
+  // ---- ristoranti ----
+  {c:'rist', n:'Trattoria U Fucularu', tel:'389 455 1100', a:'Via Euplio Reina, 20', h:'18–23:30 · chiuso mar', d:'Cucina siciliana casalinga, paste fresche, carne e pesce.', co:'37.5040376,15.0883065', book:1},
+  {c:'rist', n:'Ciauru i Mari', tags:[['Pesce','soft']], tel:'320 446 2515', a:'Piazza Ogninella, 6', h:'11–23:30 tutti i giorni', d:'Specialità di mare, linguine al nero, dehors grazioso.', co:'37.5039789,15.0887337', book:1},
+  {c:'rist', n:'Ristorante da Antonio', tags:[['Pesce','soft']], tel:'347 833 0636', a:'Via Castello Ursino, 59', h:'12–15 / 19–24 · chiuso lun', d:'Pesce freschissimo e crudi accanto al Castello Ursino.', co:'37.5002041,15.0839859', book:1},
+  {c:'rist', n:'La Pentolaccia', tel:'095 250 0010', a:'Via Coppola, 30', h:'12–14:30 / 18:30–23 · chiuso lun', d:'Pasta alla Norma, al pistacchio, pesce e carne.', co:'37.5055138,15.0895359', book:1},
+  {c:'rist', n:'Trattoria da Mario', tags:[['Menù fisso','gold']], tel:'345 124 7250', a:'Via Crociferi, 29', h:'19–24 · chiuso dom', d:'Prezzo fisso ≈ 20€: antipasti, primo, secondo, dolce e vino.', co:'37.504785,15.0846964', book:1},
+  {c:'rist', n:'Trattoria Sorano', tel:'095 716 9661', a:'Via Garibaldi, 51', h:'9–23 · dom dalle 17', d:'Pasta fatta a mano, lasagne, pappardelle, secondi di carne.', co:'37.5018302,15.0854016', book:1},
+  {c:'rist', n:'Deliziosa · Cucina Tipica & Pizzoleria', tel:'327 599 5921', a:'Piazza S. Francesco d’Assisi, 8', h:'17–24 · chiuso lun', d:'Cucina siciliana, taglieri e la tipica «pizzolo».', co:'37.5029385,15.0843361', book:1},
+  {c:'rist', n:'Cuore Fresco (Piazza Duomo)', tags:[['Veg / Gluten-free','gold']], tel:'095 288 8523', a:'Via Erasmo Merletta, 13', h:'9–23', d:'Insalatone, bowl, bagel e dolci. Pause veloci sul set.', co:'37.5030028,15.0866192', book:1},
+  {c:'rist', n:'Le Tre Bocche', tags:[['Pesce','soft'],['Fascia alta','gold']], tel:'095 538738', a:'Via Ingegnere, 11', h:'20–24 · dom anche 13–15', d:'Pesce di qualità e grande antipasto di mare.', co:'37.5233876,15.0824350', book:1},
+  {c:'rist', n:'Sicilia in Bocca · Odori e Sapori di Mare', tags:[['Pesce','soft']], tel:'095 746 1361', a:'Piazza Pietro Lupo, 16', h:'12:30–15 / 19–23:30 · dom solo pranzo', d:'Pesce fresco e cucina siciliana, ottimo tonno alla griglia.', co:'37.5039615,15.0938892', book:1},
+  {c:'rist', n:'Achille', tags:[['Brace','soft']], tel:'095 218 0456', a:'Via Plebiscito, 734', h:'12:30–16 / 19–01', d:'Braceria: carne di cavallo, salsicce e pesce alla griglia.', co:'37.5073708,15.0797329', book:1},
+
+  // ---- pizza ----
+  {c:'pizza', n:'L’Antica Pizzeria da Michele', tel:'095 704 9514', a:'Via Manzoni, 80', h:'11:45–24 tutti i giorni', d:'Pizza napoletana, centralissima, ampio dehors.', co:'37.5050384,15.0858702', book:1},
+  {c:'pizza', n:'Pizzeria Deposito Bagagli', tel:'095 717 6548', a:'Piazzetta Sebastiano Addamo, 4', h:'19–00:30', d:'Pizze gourmet enormi a un minuto dal Duomo.', co:'37.5039372,15.0858554', book:1},
+  {c:'pizza', n:'Locanda Cerami', tel:'095 224 6782', a:'Via Crociferi, 69', h:'18:30–24', d:'Pizza, paste e cocktail nella scenografica Via Crociferi.', co:'37.505582,15.0847403', book:1},
+  {c:'pizza', n:'Al Vicolo Pizza&Vino', tags:[['Fino a tardi','gold']], tel:'095 836 0730', a:'Via del Colosseo, 5/7', h:'12:30–01:30', d:'Pizzeria-steakhouse aperta fino a tardi.', co:'37.5069495,15.0853501', book:1},
+  {c:'pizza', n:'Friggitoria Stella', tags:[['Friggitoria storica','gold']], tel:'095 535002', a:'Via Mons. Ventimiglia, 66', h:'17–23 · chiuso lun', d:'Storica friggitoria: pizza fritta e crispelle.', co:'37.5063014,15.0931650'},
+
+  // ---- dolci ----
+  {c:'dolci', n:'Levante Gelato Artigianale', tel:'095 668 3011', a:'Via A. di Sangiuliano, 216', h:'fino all’1:00', d:'Gelato, cannoli e brioche.', co:'37.5050623,15.0870804'},
+  {c:'dolci', n:'Maravigghia Gelateria', tel:'348 252 1668', a:'Via Garibaldi, 64', h:'7:00–23:30', d:'Gelato siciliano.', co:'37.5017549,15.0842755'},
+  {c:'dolci', n:'Gelateria Pellegrino', tags:[['Granita & brioche','soft']], tel:'348 097 4979', a:'Piazza dei Martiri, 22', h:'apre alle 7:00', d:'Colazione siciliana e gelato.', co:'37.5034931,15.0952725'},
+  {c:'dolci', n:'Gelateria Zio Pietro (dal 1964)', tel:'349 812 6617', a:'Via Porta di Ferro, 47', h:'chiuso lun', d:'Storica, ottimo pistacchio.', co:'37.5020701,15.0932171'},
+
+  // ---- farmacie ----
+  {c:'farma', n:'Farmacia Elefante', tel:'095 715 0538', a:'Piazza del Duomo, 16', h:'Lun-Ven 8–20, Sab 9–13', co:'37.5025399,15.0867834'},
+  {c:'farma', n:'Farmacia Cutelli', tags:[['Notturna','hot']], tel:'095 531400', a:'Via V. Emanuele II, 54', h:'7:00–24:00 tutti i giorni', co:'37.5035076,15.0935285'},
+  {c:'farma', n:'Farmacia Coffa', tags:[['Sempre aperta','hot']], tel:'095 345214', a:'Via Cristoforo Colombo, 25', h:'8:30–22:30 anche domenica', co:'37.5004464,15.087911'},
+  {c:'farma', n:'Farmacia «Ai Minoriti»', tel:'095 316784', a:'Via Etnea, 79', h:'8:30–13 / 16:30–20', co:'37.5058617,15.0865287'},
+  {c:'farma', n:'Farmacia De Gaetani', tel:'095 326962', a:'Via V. Emanuele II, 114', h:'8:30–20, Sab 9–13', co:'37.5032164,15.0909097'},
+  {c:'farma', n:'Farmacia Dr. Max', tel:'095 715 0557', a:'Via Garibaldi, 74', h:'8:30–13 / 16–20', co:'37.5017302,15.0840065'},
+  {c:'farma', n:'Antica Farmacia Bellomo', tel:'095 715 0525', a:'Via Garibaldi, 24', h:'8–13 / 16:30–20', co:'37.5021286,15.0862954'},
+  {c:'farma', n:'Farmacia Quattro Canti', tel:'095 311408', a:'Via Etnea, 39', h:'8:30–20', co:'37.5047772,15.0867691'},
+
+  // ---- sanità ----
+  {c:'sanita', n:'Ospedale Garibaldi-Centro · Pronto Soccorso', tags:[['DEA','hot']], tel:'095 7591111', a:'Piazza S. Maria di Gesù, 5', h:'Emergenze 24h · 118', q:'Ospedale Garibaldi Centro Catania'},
+  {c:'sanita', n:'Guardia Medica · Continuità Assistenziale', tags:[['Notte/festivi','gold']], tel:'095 377122', a:'Corso Italia, 234 (alt. 095 382113)', q:'Guardia Medica Corso Italia Catania'},
+  {c:'sanita', n:'ASP Catania · Prenotazioni (CUP)', tel:'800 954414', a:'Numero verde · Via S. Maria La Grande, 5', call:true},
+
+  // ---- spesa ----
+  {c:'spesa', n:'Famila Superstore', tags:[['24h','hot']], tel:'095 487 9061', a:'Piazza S. Maria di Gesù, 10', h:'aperto 24 ore', co:'37.5126059,15.0782456'},
+  {c:'spesa', n:'Maxistore Decò', tel:'095 326099', a:'Corso Sicilia, 50', h:'8–21 (dom 8:30–21)', co:'37.507541,15.089621'},
+  {c:'spesa', n:'Lidl · Corso Sicilia', tel:'800 480048', a:'Corso Sicilia, 64', h:'8–21:30 tutti i giorni', co:'37.50738,15.09041'},
+  {c:'spesa', n:'Penny', tel:'800 901290', a:'Corso Sicilia, 39/41', h:'8–21 tutti i giorni', co:'37.5078163,15.088274'},
+  {c:'spesa', n:'Eurospin', a:'Via Don Luigi Sturzo, 2', h:'8:30–20:30 tutti i giorni', co:'37.5066447,15.0890417'},
+  {c:'spesa', n:'COOP · Via Androne', tel:'095 1695 4628', a:'Via Androne, 2', h:'8:30–20:30 (dom 8:30–13)', co:'37.5090963,15.0821438'},
+  {c:'spesa', n:'COOP · Via Filzi', tel:'095 1695 4698', a:'Via Fabio Filzi, 8', h:'8:30–20:30 tutti i giorni', co:'37.5109672,15.0749031'},
+  {c:'spesa', n:'Lidl · Regina Margherita', tel:'800 480048', a:'Viale Regina Margherita', h:'8–21:30 tutti i giorni', co:'37.5127,15.08199'},
+
+  // ---- lavanderie ----
+  {c:'lav', n:'Lavanderia Self Service Catania', tags:[['Vicino al Duomo','soft']], tel:'392 579 3277', a:'Via della Lettera, 11', h:'7–23 tutti i giorni', co:'37.5022628,15.0847029'},
+  {c:'lav', n:'Laundry 213', tags:[['Carta di credito','soft']], tel:'333 372 3597', a:'Via Garibaldi, 213', h:'7–23', co:'37.500697,15.0795652'},
+  {c:'lav', n:'Laundromat Catania (Self Wash)', tags:[['Lava-asciuga-piega','soft']], tel:'333 453 4880', a:'Via V. Emanuele II, 109', h:'9–13 / 16–20:30', co:'37.5031229,15.0910464'},
+  {c:'lav', n:'Lavanderia Florio', tel:'324 772 4617', a:'Viale della Libertà, 94', h:'7–24 tutti i giorni', co:'37.5102408,15.0982774'},
+
+  // ---- da vedere ----
+  {c:'vedere', n:'La Pescheria · mercato del pesce', a:'Piazza Alonzo di Benedetto', h:'Lun-Sab 7–14', d:'Lo spettacolo della Catania autentica, a 2 min dal Duomo.', co:'37.5018273,15.0870043'},
+  {c:'vedere', n:'Cattedrale di Sant’Agata', tel:'339 485 9942', a:'Piazza Duomo', h:'7:15–12:30 / 16–19', co:'37.5024087,15.0877191'},
+  {c:'vedere', n:'Teatro Greco-Romano', tel:'095 715 0508', a:'Via V. Emanuele II, 266', h:'9–19', co:'37.502662,15.0838703'},
+  {c:'vedere', n:'Monastero dei Benedettini', tel:'334 924 2464', a:'Piazza Dante, 32', h:'visite 9:30–17', co:'37.5036918,15.0800071'},
+  {c:'vedere', n:'Castello Ursino · museo', tel:'095 345830', a:'Piazza Federico di Svevia', h:'verificare aperture', co:'37.4991663,15.0844932'},
+  {c:'vedere', n:'Villa Bellini · giardino storico', a:'Via Etnea, 292', h:'6–22', co:'37.510677,15.0849635'},
+  {c:'vedere', n:'San Giovanni Li Cuti · caletta', tags:[['Mare · ~10 min','soft']], a:'Via San Giovanni Li Cuti', d:'Caletta di scogli neri vicino al centro.', co:'37.5193162,15.1088391'},
+  {c:'vedere', n:'La Playa · lidi sabbiosi', tags:[['Mare · ~15 min','soft']], a:'Litorale sud di Catania', q:'La Playa Catania'},
+  {c:'vedere', n:'Aci Trezza · Faraglioni dei Ciclopi', tags:[['Gita · ~20 min','soft']], a:'Aci Trezza / Aci Castello', q:'Faraglioni dei Ciclopi Aci Trezza'},
+  {c:'vedere', n:'Etna · Rifugio Sapienza', tags:[['Gita · ~1h','soft']], a:'Crateri e funivia, quota 1.900 m', q:'Rifugio Sapienza Etna'},
+  {c:'vedere', n:'Taormina & Isola Bella', tags:[['Gita · ~50 min','soft']], a:'Taormina (ME)', q:'Isola Bella Taormina'},
+  {c:'vedere', n:'Siracusa & Ortigia', tags:[['Gita · ~1h','soft']], a:'Centro storico UNESCO', q:'Ortigia Siracusa'},
+];
+
+/* ---------------- helpers ---------------- */
+const store = {
+  get(){ try{ return JSON.parse(localStorage.getItem('bibCT_fav')||'[]'); }catch(e){ return mem; } },
+  set(v){ mem=v; try{ localStorage.setItem('bibCT_fav', JSON.stringify(v)); }catch(e){} }
+};
+let mem = [];
+let favs = store.get();
+
+function digits(t){ return (t||'').replace(/\D/g,''); }
+function telHref(t){
+  const d = digits(t);
+  if(d.length<=4) return 'tel:'+d;
+  return 'tel:+39'+d;
+}
+function waHref(t){
+  const d = digits(t);
+  if(d[0]==='3' && d.length>=9 && d.length<=10) return 'https://wa.me/39'+d;
+  return null;
+}
+function mapHref(p){
+  let dest;
+  if(p.co){ dest = p.co; }
+  else { let q = p.q||p.n; if(!/catania/i.test(q)) q += ' Catania'; dest = encodeURIComponent(q); }
+  return 'https://www.google.com/maps/dir/?api=1&destination='+dest;
+}
+const idOf = p => p.c+'|'+p.n;
+
+const I = {
+  phone:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1.9.3 1.8.6 2.6a2 2 0 0 1-.5 2.1L8 9.6a16 16 0 0 0 6 6l1.2-1.2a2 2 0 0 1 2.1-.5c.8.3 1.7.5 2.6.6a2 2 0 0 1 1.7 2z"/></svg>',
+  pin:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 12-9 12s-9-5-9-12a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>',
+  wa:'<svg viewBox="0 0 24 24" fill="currentColor"><path d="M.5 23.5l1.6-5.9A11.4 11.4 0 1 1 12 23.4a11.4 11.4 0 0 1-5.6-1.5L.5 23.5zM6.7 20l.4.2a9.5 9.5 0 1 0-3.2-3.1l.2.4-.9 3.4 3.5-.9zM17.2 14.3c-.1-.2-.5-.4-1-.6s-1.5-.7-1.7-.8-.4-.1-.5.1-.6.8-.8 1-.3.2-.5.1a7.7 7.7 0 0 1-2.3-1.4 8.6 8.6 0 0 1-1.6-2c-.2-.3 0-.4.1-.6l.4-.4.3-.4v-.4c0-.1-.5-1.3-.7-1.8s-.4-.4-.5-.4h-.5a1 1 0 0 0-.7.3 3 3 0 0 0-.9 2.2 5.2 5.2 0 0 0 1.1 2.7 11.8 11.8 0 0 0 4.6 4 5.3 5.3 0 0 0 3.2.7 2.6 2.6 0 0 0 1.7-1.2 2.1 2.1 0 0 0 .1-1.2z"/></svg>',
+  mail:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 7l9 6 9-6"/></svg>',
+};
+
+/* ---------------- render ---------------- */
+let active = 'home';
+const chipsEl = document.getElementById('chips');
+const listEl  = document.getElementById('list');
+const qEl     = document.getElementById('q');
+const tipEl   = document.querySelector('.tip');
+
+function buildChips(){
+  const all = [{k:'home',label:'🏠 Home'},{k:'all',label:'Tutti'}].concat(CATS);
+  chipsEl.innerHTML = all.map(c =>
+    `<button class="chip ${c.star?'star':''} ${c.k===active?'on':''}" data-k="${c.k}">${c.label}</button>`
+  ).join('');
+  chipsEl.querySelectorAll('.chip').forEach(b=>{
+    b.onclick=()=>{ active=b.dataset.k; buildChips(); render(); window.scrollTo({top:0,behavior:'smooth'}); };
+  });
+}
+
+function card(p){
+  const fav = favs.includes(idOf(p));
+  if(p.c==='troupe'){
+    const wa = waHref(p.tel);
+    let tb = '';
+    if(p.tel) tb += `<a class="btn btn-call" href="${telHref(p.tel)}">${I.phone}Chiama</a>`;
+    if(wa)    tb += `<a class="btn btn-wa" href="${wa}" target="_blank" rel="noopener">${I.wa}WhatsApp</a>`;
+    if(p.email) tb += `<a class="btn btn-mail" href="mailto:${p.email}">${I.mail}Email</a>`;
+    return `<div class="card">
+      <div class="card-h"><div class="nm">${p.n}</div><div class="fav ${fav?'on':''}" data-id="${idOf(p)}">${fav?'★':'☆'}</div></div>
+      <div class="tags"><span class="tag gold">${p.role}</span></div>
+      ${p.tel?`<div class="meta">${p.tel}</div>`:''}
+      ${p.email?`<div class="desc">${p.email}</div>`:''}
+      <div class="actions">${tb}</div>
+    </div>`;
+  }
+  const wa = p.book ? waHref(p.tel) : null;
+  let btns = '';
+  if(p.tel) btns += `<a class="btn btn-call" href="${telHref(p.tel)}">${I.phone}Chiama</a>`;
+  if(p.co || p.q) btns += `<a class="btn btn-map" href="${mapHref(p)}" target="_blank" rel="noopener">${I.pin}Indicazioni</a>`;
+  if(wa) btns += `<a class="btn btn-wa" href="${wa}?text=${encodeURIComponent('Salve, vorrei prenotare un tavolo')}" target="_blank" rel="noopener">${I.wa}Prenota</a>`;
+  const tags = (p.tags||[]).map(t=>`<span class="tag ${t[1]}">${t[0]}</span>`).join('');
+  return `<div class="card">
+    <div class="card-h">
+      <div class="nm">${p.n}</div>
+      <div class="fav ${fav?'on':''}" data-id="${idOf(p)}">${fav?'★':'☆'}</div>
+    </div>
+    ${tags?`<div class="tags">${tags}</div>`:''}
+    <div class="meta">${p.a||''}${p.h?` · <span class="h">${p.h}</span>`:''}${p.tel?` · ${p.tel}`:''}</div>
+    ${p.d?`<div class="desc">${p.d}</div>`:''}
+    ${btns?`<div class="actions">${btns}</div>`:''}
+  </div>`;
+}
+
+function sectionTitle(meta){
+  return `<div class="sec-title"><span class="ic">${meta.ic||''}</span><h2>${meta.title||meta.label}</h2><span class="rule"></span></div>`;
+}
+function cardsFor(k, grp){
+  if(k==='troupe'){
+    let h='';
+    DEPS.forEach(d=>{
+      const g=grp.filter(p=>p.dep===d);
+      if(g.length) h+=`<div class="dep-head">${d}</div>`+g.map(card).join('');
+    });
+    const rest=grp.filter(p=>!DEPS.includes(p.dep));
+    if(rest.length) h+=rest.map(card).join('');
+    return h;
+  }
+  return grp.map(card).join('');
+}
+function bindFavs(){
+  listEl.querySelectorAll('.fav').forEach(el=>{
+    el.onclick=()=>{
+      const id=el.dataset.id;
+      favs = favs.includes(id) ? favs.filter(x=>x!==id) : favs.concat(id);
+      store.set(favs); render();
+    };
+  });
+}
+function homeView(){
+  const order=['troupe','utili','rist','pizza','dolci','farma','sanita','spesa','lav','vedere','fav'];
+  let h='<div class="home-intro">Scegli una sezione</div><div class="home">';
+  order.forEach(k=>{
+    const t=TILE[k];
+    const count=(k==='fav')?favs.length:P.filter(p=>p.c===k).length;
+    const unit=(k==='fav')?'salvati':(k==='troupe'?'persone':'voci');
+    const cls='tile'+(k==='troupe'?' troupe':'')+(k==='fav'?' fav':'');
+    h+=`<div class="${cls}" data-k="${k}"><div class="ic">${t.ic}</div><div class="t">${t.t}</div><div class="c">${count} ${unit}</div></div>`;
+  });
+  return h+'</div>';
+}
+
+function render(){
+  const term = qEl.value.trim().toLowerCase();
+  if(active==='home' && !term){
+    tipEl.style.display='none';
+    listEl.innerHTML = homeView();
+    listEl.querySelectorAll('.tile').forEach(el=>{
+      el.onclick=()=>{ active=el.dataset.k; qEl.value=''; buildChips(); render(); window.scrollTo({top:0,behavior:'smooth'}); };
+    });
+    return;
+  }
+  tipEl.style.display='';
+  const eff = (active==='home') ? 'all' : active;
+  let items = P.slice();
+  if(eff==='fav') items = items.filter(p=>favs.includes(idOf(p)));
+  else if(eff!=='all') items = items.filter(p=>p.c===eff);
+  if(term) items = items.filter(p => (p.n+' '+(p.a||'')+' '+(p.d||'')+' '+(p.tel||'')+' '+(p.role||'')+' '+(p.email||'')).toLowerCase().includes(term));
+
+  if(!items.length){
+    listEl.innerHTML = `<div class="empty">${eff==='fav'?'Nessun preferito ancora. Tocca la ☆ su una scheda per salvarla qui.':'Nessun risultato. Prova un altro termine.'}</div>`;
+    return;
+  }
+  const order = CATS.filter(c=>!c.star).map(c=>c.k);
+  let html='';
+  if(eff==='all' || eff==='fav'){
+    order.forEach(k=>{
+      const grp = items.filter(p=>p.c===k);
+      if(!grp.length) return;
+      html += sectionTitle(CATS.find(c=>c.k===k)) + cardsFor(k, grp);
+    });
+  } else {
+    html += sectionTitle(CATS.find(c=>c.k===eff)) + cardsFor(eff, items);
+  }
+  listEl.innerHTML = html;
+  bindFavs();
+}
+
+qEl.addEventListener('input', render);
+document.querySelector('.brand-title').addEventListener('click', ()=>{
+  active='home'; qEl.value=''; buildChips(); render(); window.scrollTo({top:0,behavior:'smooth'});
+});
+document.getElementById('crewBtn').onclick = ()=>{
+  active='troupe'; qEl.value=''; buildChips(); render();
+  window.scrollTo({top:0, behavior:'smooth'});
+};
+buildChips();
+render();
+
+/* ---- PWA: Service Worker ---- */
+if('serviceWorker' in navigator){
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('./sw.js').catch(()=>{});
+  });
+}
+
+/* ---- PWA: Banner installazione Android (beforeinstallprompt) ---- */
+let deferredPrompt = null;
+const banner = document.getElementById('install-banner');
+const installBtn = document.getElementById('install-btn');
+const closeBtn = document.getElementById('install-close');
+
+window.addEventListener('beforeinstallprompt', e => {
+  e.preventDefault();
+  deferredPrompt = e;
+  // Mostra il banner solo se non è già stata installata
+  if(!localStorage.getItem('pwa-installed')){
+    banner.style.display = 'flex';
+  }
+});
+
+installBtn.onclick = async () => {
+  if(!deferredPrompt) return;
+  deferredPrompt.prompt();
+  const { outcome } = await deferredPrompt.userChoice;
+  if(outcome === 'accepted') localStorage.setItem('pwa-installed','1');
+  deferredPrompt = null;
+  banner.style.display = 'none';
+};
+
+closeBtn.onclick = () => {
+  banner.style.display = 'none';
+  localStorage.setItem('pwa-installed','1');
+};
+
+window.addEventListener('appinstalled', () => {
+  banner.style.display = 'none';
+  deferredPrompt = null;
+});
+</script>
+</body>
+</html>

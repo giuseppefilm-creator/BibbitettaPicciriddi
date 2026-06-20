@@ -1,0 +1,36 @@
+{
+  "name": "Bibbietta · Catania",
+  "short_name": "Bibbietta",
+  "description": "Guida di produzione per la troupe – Catania (Picciriddi)",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "theme_color": "#1d1d1d",
+  "background_color": "#fffdf8",
+  "lang": "it",
+  "icons": [
+    {
+      "src": "icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    },
+    {
+      "src": "icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "maskable"
+    }
+  ],
+  "categories": ["utilities", "productivity"],
+  "shortcuts": [
+    {
+      "name": "Elenco troupe",
+      "short_name": "Troupe",
+      "description": "Vai direttamente all'elenco della troupe",
+      "url": "./index.html#troupe",
+      "icons": [{ "src": "icon.svg", "sizes": "any" }]
+    }
+  ]
+}
